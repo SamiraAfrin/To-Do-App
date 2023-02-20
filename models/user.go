@@ -1,7 +1,7 @@
 package models
 
 // User represent the user model
-type UserDB struct {
-	ID        int64  `json:"id"`
+type User struct {
+	ID        int64  `json:"id" gorm:"primaryKey"`
 	Name      string `json:"name"`
 }

@@ -6,8 +6,8 @@ import (
 )
 
 // TaskDB represent the task model
-type TaskDB struct {
-	ID        int64      `json:"id"`
+type Task struct {
+	ID        int64      `json:"id" gorm:"primaryKey"`
 	Name   	  string     `json:"name"`
 	Status    string     `json:"status"`
 	Comment   string     `json:"comment"`

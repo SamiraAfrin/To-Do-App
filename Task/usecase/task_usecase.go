@@ -42,7 +42,7 @@ func (t *taskUsecase) Delete(c context.Context, task_id int64) error {
 }
 
 // fetch the task using task id
-func (t *taskUsecase) GetByID(c context.Context, task_id int64) (*models.TaskDB, error){
+func (t *taskUsecase) GetByID(c context.Context, task_id int64) (*models.Task, error){
 
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
@@ -57,7 +57,7 @@ func (t *taskUsecase) GetByID(c context.Context, task_id int64) (*models.TaskDB,
 }
 
 // fetch all the data using the user id
-func (t *taskUsecase) GetByUserID(c context.Context, user_id int64) ([]*models.TaskDB, error){
+func (t *taskUsecase) GetByUserID(c context.Context, user_id int64) ([]*models.Task, error){
 	
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
@@ -72,7 +72,7 @@ func (t *taskUsecase) GetByUserID(c context.Context, user_id int64) ([]*models.T
 }
 
 // fetch all the task in the task database 
-func (t *taskUsecase) GetAllTask(c context.Context) ([]*models.TaskDB, error){
+func (t *taskUsecase) GetAllTask(c context.Context) ([]*models.Task, error){
 	 
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
@@ -86,7 +86,7 @@ func (t *taskUsecase) GetAllTask(c context.Context) ([]*models.TaskDB, error){
 }
 
 // Store the data in the task database
-func (t *taskUsecase) Store(c context.Context, task *models.TaskDB) error{
+func (t *taskUsecase) Store(c context.Context, task *models.Task) error{
 	
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
@@ -104,7 +104,7 @@ func (t *taskUsecase) Store(c context.Context, task *models.TaskDB) error{
 }
 
 // Update the existing task
-func (t *taskUsecase) Update(c context.Context, task *models.TaskDB) error{
+func (t *taskUsecase) Update(c context.Context, task *models.Task) error{
 
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
@@ -128,7 +128,8 @@ func (t *taskUsecase) UpdateDone(c context.Context, task_id int64, task *Task.Ta
 
 	tm := time.Now()
 	task.UpdatedAt = &tm
-	taskerr := t.taskRepo.UpdateDone(ctx, task_id, &models.TaskDB{
+	taskerr := t.taskRepo.UpdateDone(ctx, task_id, &models.Task{
+		ID	  : task_id,
 		Status: task.Status,
 		UpdatedAt: task.UpdatedAt,
 	})

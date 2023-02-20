@@ -3,9 +3,10 @@ package repository
 import (
 
 	"context"
-	"database/sql"
-	"fmt"
-	"github.com/sirupsen/logrus"
+	// "database/sql"
+	// "fmt"
+	// "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 
 	"To_Do_App/User"
 	"To_Do_App/models"
@@ -13,10 +14,10 @@ import (
 )
 
 type mysqlUserRepo struct {
-	Conn *sql.DB
+	Conn *gorm.DB
 }
 
-func NewMysqlUserRepo(db *sql.DB) User.Repository{
+func NewMysqlUserRepo(db *gorm.DB) User.Repository{
 
 	return &mysqlUserRepo{
 		Conn: db,
@@ -24,85 +25,37 @@ func NewMysqlUserRepo(db *sql.DB) User.Repository{
 }
 
 // Store new data in the database
-func (m *mysqlUserRepo) Store(ctx context.Context, user *models.UserDB) error{
+func (m *mysqlUserRepo) Store(ctx context.Context, user *models.User) error{
 
-	query := "INSERT INTO users (name) VALUES (?);"
-	stmt, err := m.Conn.PrepareContext(ctx, query)
-	if err != nil{
-		return err
-	}
-
-	res, err := stmt.ExecContext(ctx, user.Name)
-	if err!= nil{
-		return err
-	}
-
-	lastID, err := res.LastInsertId()
-	if err != nil{
-		return err
-	}
-
-	user.ID = lastID
-	return nil
+	result := m.Conn.Create(&user)
+	
+	return result.Error
 
 }	
 
 // Update the existing user
-func (m *mysqlUserRepo) Update(ctx context.Context, user *models.UserDB) error{
+func (m *mysqlUserRepo) Update(ctx context.Context, user *models.User) error{
 
-	query := "UPDATE users SET name=? WHERE id=?;"
+	result:= m.Conn.Save(&user)
 
-	stmt, err:= m.Conn.PrepareContext(ctx, query)
-	if err != nil{
-		return err
-	}
-
-	res, err := stmt.ExecContext(ctx, user.Name, user.ID)
-	if err!= nil{
-		return err
-	}
-
-	affect, err := res.RowsAffected()
-	if err!= nil{
-		return err
-	}
-
-	if affect != 1{
-		err = fmt.Errorf("Weird Behaviour. Total Affected: %d", affect)
-		return err
-	}
-
-	return nil
+	return result.Error
+	
 	
 }
 
 // Get all the user in the database
-func (m *mysqlUserRepo) GetAllUser(ctx context.Context) ([]*models.UserDB, error) {
+func (m *mysqlUserRepo) GetAllUser(ctx context.Context) ([]*models.User, error) {
 
-	rows, err := m.Conn.Query("SELECT id, name FROM users;")
+	// var result []*models.TaskDB
+	// d:= m.Conn.Find(&result)
+	// fmt.Println(result)
 
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
+	result := make([]*models.User, 0)
+	d:= m.Conn.Find(&result)
 
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			logrus.Error(err)
-		}
-	}()
+	return result, d.Error
 
-	result := make([]*models.UserDB, 0)
-	for rows.Next() {
-		u := new(models.UserDB)
-		err = rows.Scan(
-			&u.ID,
-			&u.Name,
-		)
-		result = append(result, u)
-	}
-	return result, nil
+	
 }
 
 

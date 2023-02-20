@@ -1,21 +1,19 @@
 package main
 
 import (
-
 	"fmt"
 	"log"
 	"time"
 
 	// Echo Framewrokss
-	"github.com/labstack/echo" 
-	// "github.com/davecgh/go-spew/spew"
+	"github.com/labstack/echo"
 
 	//Viper
 	"github.com/spf13/viper"
-    
+
 	//Database
-	"database/sql"
-	"github.com/go-sql-driver/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 
 	//Repository
 	_taskRepo "To_Do_App/Task/repository"
@@ -29,7 +27,7 @@ import (
 	_taskHttpDelivery "To_Do_App/Task/delivery/http"
 )
 
-func init(){
+func init() {
 
 	viper.SetConfigFile(`config.json`)
 	err := viper.ReadInConfig()
@@ -42,54 +40,38 @@ func init(){
 	}
 }
 
-func main(){
+func main() {
+
+	dsn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", viper.GetString(`database.user`),
+		viper.GetString(`database.pass`), viper.GetString(`database.net`), viper.GetString(`database.host`),
+		viper.GetInt(`database.port`), viper.GetString(`database.name`))
 	
-	cfg := mysql.Config{
-        User:      viper.GetString(`database.user`),
-        Passwd:    viper.GetString(`database.pass`),
-        Net:       viper.GetString(`database.net`),
-        Addr:      fmt.Sprintf("%s:%d",viper.GetString(`database.host`), viper.GetInt(`database.port`)),
-        DBName:    viper.GetString(`database.name`),
-		ParseTime: viper.GetBool(`database.parseTime`),
+	// Get a database handle.
+	var err error
+	dbConn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	
 
-    }
-
-    // Get a database handle.
-    var err error
-    dbConn, err := sql.Open("mysql", cfg.FormatDSN())
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    pingErr := dbConn.Ping()
-    if pingErr != nil {
-        log.Fatal(pingErr)
-    }
-
-	defer func(){
-
-		err := dbConn.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
-
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Connected!")
 
 	// Echo Framewrok
 	e := echo.New()
 
-	// Repository
+	// // Repository
 	taskRepo := _taskRepo.NewMysqlTaskRepo(dbConn)
 	userRepo := _userRepo.NewMysqlUserRepo(dbConn)
-	
-	//Usecase 
+
+	// //Usecase
 	timeoutContext := 10 * time.Second
 	taskUsecase := _taskUsecase.NewTaskUsecase(taskRepo, timeoutContext)
+	// fmt.Println(taskUsecase)
 	userUsecase := _userUsecase.NewUserUsecase(userRepo, timeoutContext)
 
-	//Delivery
-	_taskHttpDelivery.NewTaskHandler(e,taskUsecase,userUsecase) 
-	
-	e.Logger.Fatal(e.Start(viper.GetString("server.address")))	
+	// //Delivery
+	_taskHttpDelivery.NewTaskHandler(e,taskUsecase,userUsecase)
+
+	e.Logger.Fatal(e.Start(viper.GetString("server.address")))
 
 }

@@ -12,8 +12,8 @@ import (
 
 type Usecase interface {
 
-	Store(ctx context.Context, a *models.UserDB) error
-	Update(ctx context.Context, a *models.UserDB) error	
-	GetAllUser(c context.Context) ([]*models.UserDB, error)
+	Store(ctx context.Context, a *models.User) error
+	Update(ctx context.Context, a *models.User) error	
+	GetAllUser(c context.Context) ([]*models.User, error)
 
 }

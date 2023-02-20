@@ -3,11 +3,12 @@ package repository
 import (
 
 	"context"
-	"database/sql"
-	"fmt"
+	"gorm.io/gorm"
+	"errors"
+	
 	"To_Do_App/Task"
 	"To_Do_App/models"
-	"github.com/sirupsen/logrus"
+	
 
 
 )
@@ -17,12 +18,12 @@ const (
 )
 
 type mysqlTaskRepo struct{
-	Conn *sql.DB
+	Conn *gorm.DB
 }
 
 
 
-func NewMysqlTaskRepo(db *sql.DB) Task.Repository{
+func NewMysqlTaskRepo(db *gorm.DB) Task.Repository{
 
 	return &mysqlTaskRepo{
 		Conn: db,
@@ -32,238 +33,81 @@ func NewMysqlTaskRepo(db *sql.DB) Task.Repository{
 // Delete the task for the specific task id
 func (m *mysqlTaskRepo) Delete(ctx context.Context, task_id int64) error{
 
-	query := "DELETE FROM tasks WHERE id = ?"
+	var task models.Task
+	result:= m.Conn.Delete(&task, task_id)
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
-	if err != nil{
-		return err
-	}
-
-	res, err := stmt.ExecContext(ctx, task_id)
-	if err != nil {
-		return nil
-	}
-
-	rowsAfected, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rowsAfected != 1{
-		err = fmt.Errorf("Weird Behaviour. Total Affected %d", rowsAfected)
-		return err
-	}
-
-	return nil
+	return result.Error
+	 
+	
 }
 
-// Get a specific Task using task id
-func(m *mysqlTaskRepo) GetByID(ctx context.Context, task_id int64) (res *models.TaskDB, err error){
+// Get a specific Task using task id 
+func(m *mysqlTaskRepo) GetByID(ctx context.Context, task_id int64) (res *models.Task, err error){
 
-	query := "SELECT id, name, status, comment, updated_at, created_at, user_id FROM tasks WHERE id = ?"
-
-	list, err := m.fetch(ctx, query, task_id)
-	if err != nil {
-		return nil, err
+	var task models.Task
+	result:= m.Conn.First(&task, task_id)
+	if result.Error != nil {
+		return &task, errors.New("This task doesn't exist")
 	}
 
-	if len(list) > 0 {
-		res = list[0]
-	} else {
-		return nil, models.ErrNotFound
-	}
-
-	return res, nil
+	return &task, result.Error
+	
 }
 
-func (m *mysqlTaskRepo) GetAllTask(ctx context.Context) ([]*models.TaskDB, error) {
+func (m *mysqlTaskRepo) GetAllTask(ctx context.Context) ([]*models.Task, error) {
 
-	rows, err := m.Conn.Query("SELECT id, name, status, comment, updated_at, created_at, user_id FROM tasks;")
-
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
+	var result []*models.Task
+	query := m.Conn.Find(&result)
+	if len(result) == 0  {
+		return result, errors.New("Currently task table doesn't have any data")
 	}
-
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			logrus.Error(err)
-		}
-	}()
-
-	result := make([]*models.TaskDB, 0)
-	for rows.Next() {
-		t := new(models.TaskDB)
-		err = rows.Scan(
-			&t.ID,
-			&t.Name,
-			&t.Status,
-			&t.Comment,
-			&t.UpdatedAt,
-			&t.CreatedAt,
-			&t.UserID,
-		)
-		result = append(result, t)
-	}
-
-	return result, nil
+	
+	return result, query.Error
+	
 }
 
-// Fetch all the data using user_id
- func (m *mysqlTaskRepo) GetByUserID(ctx context.Context, user_id int64) ([]*models.TaskDB, error){
+// Fetch all the data using user_id 
+ func (m *mysqlTaskRepo) GetByUserID(ctx context.Context, user_id int64) ([]*models.Task, error){
 
-	query := "SELECT id, name, status, comment, updated_at, created_at, user_id FROM tasks WHERE user_id = ?"
-
-	rows, err := m.Conn.QueryContext(ctx, query, user_id)
-
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
+	var result []*models.Task
+	query := m.Conn.Where("user_id = ?", user_id).Find(&result)
+	if len(result) == 0  {
+		return result, errors.New("This user don't have any task")
 	}
-
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			logrus.Error(err)
-		}
-	}()
-
-	result := make([]*models.TaskDB, 0)
-	for rows.Next() {
-		t := new(models.TaskDB)
-		err = rows.Scan(
-			&t.ID,
-			&t.Name,
-			&t.Status,
-			&t.Comment,
-			&t.UpdatedAt,
-			&t.CreatedAt,
-			&t.UserID,
-		)
-		result = append(result, t)
-	}
-
-	return result, nil
+	
+	return result, query.Error
 }
 
 
 // Store new data in the database
- func (m *mysqlTaskRepo) Store(ctx context.Context, task *models.TaskDB) error{
+ func (m *mysqlTaskRepo) Store(ctx context.Context, task *models.Task) error{
 
-	query := "INSERT INTO tasks (name, status, comment, updated_at, created_at, user_id) VALUES (?, ?, ?, ?, ?, ?);"
-	stmt, err := m.Conn.PrepareContext(ctx, query)
-	if err != nil{
-		return err
-	}
+	result := m.Conn.Create(&task)
 
-	res, err := stmt.ExecContext(ctx, task.Name, task.Status, task.Comment, task.UpdatedAt, task.CreatedAt, task.UserID)
-	if err!= nil{
-		return err
-	}
-
-	lastID, err := res.LastInsertId()
-	if err != nil{
-		return err
-	}
-
-	task.ID = lastID
-	return nil
+	return result.Error
 
 	}	
 
 // Update the existing task 
-func (m *mysqlTaskRepo) Update(ctx context.Context, task *models.TaskDB) error{
+func (m *mysqlTaskRepo) Update(ctx context.Context, task *models.Task) error{
 
-	query := "UPDATE tasks SET name=?, status=?, comment=?, updated_at=? WHERE id =?;"
+	result:= m.Conn.Save(&task)
 
-	stmt, err:= m.Conn.PrepareContext(ctx, query)
-	if err != nil{
-		return err
-	}
-
-	res, err := stmt.ExecContext(ctx, task.Name, task.Status, task.Comment, task.UpdatedAt, task.ID)
-	if err!= nil{
-		return err
-	}
-
-	affect, err := res.RowsAffected()
-	if err!= nil{
-		return err
-	}
-
-	if affect != 1{
-		err = fmt.Errorf("Weird Behaviour. Total Affected: %d", affect)
-		return err
-	}
-
-	return nil
+	return result.Error
 	
 
 }
 
-//Patch --> only status update
-func (m *mysqlTaskRepo) UpdateDone(ctx context.Context, task_id int64, task *models.TaskDB) error {
+//Patch --> only status update 
+func (m *mysqlTaskRepo) UpdateDone(ctx context.Context, task_id int64, task *models.Task) error {
 
-	query := "UPDATE tasks SET status=?, updated_at=? WHERE id =?"
+	result := m.Conn.Model(&task).Select("Status", "UpdatedAt").Updates(models.Task{Status: task.Status, UpdatedAt: task.UpdatedAt})
 
-	stmt, err:= m.Conn.PrepareContext(ctx, query)
-	if err != nil{
-		return nil
-	}
-
-	res, err := stmt.ExecContext(ctx, task.Status, task.UpdatedAt, task_id)
-	if err!= nil{
-		return err
-	}
-
-	affect, err := res.RowsAffected()
-	if err!= nil{
-		return err
-	}
-
-	if affect != 1{
-		err = fmt.Errorf("Weird Behaviour. Total Affected: %d", affect)
-		return err
-	}
-
-	return nil
+	return result.Error
 
 }
 
-// Utility Function
-func (m *mysqlTaskRepo) fetch(ctx context.Context, query string, args ...interface{}) ([]*models.TaskDB, error) {
 
-	rows, err := m.Conn.QueryContext(ctx, query, args...)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			logrus.Error(err)
-		}
-	}()
-
-	result := make([]*models.TaskDB, 0)
-	for rows.Next() {
-		t := new(models.TaskDB)
-		err = rows.Scan(
-			&t.ID,
-			&t.Name,
-			&t.Status,
-			&t.Comment,
-			&t.UpdatedAt,
-			&t.CreatedAt,
-			&t.UserID,
-		)
-		result = append(result, t)
-	}
-	
-	return result, nil
-}
 
 
 

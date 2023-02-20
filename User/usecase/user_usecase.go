@@ -24,7 +24,7 @@ func NewUserUsecase(u User.Repository, timeout time.Duration) User.Usecase {
 }
 
 // Store new data in the database
-func (u *userUsecase) Store(c context.Context, user *models.UserDB) error{
+func (u *userUsecase) Store(c context.Context, user *models.User) error{
 	
 	ctx, cancel := context.WithTimeout(c, u.contextTimeout)
 	defer cancel()
@@ -38,7 +38,7 @@ func (u *userUsecase) Store(c context.Context, user *models.UserDB) error{
 }
 
 // Update user info
-func (u *userUsecase) Update(c context.Context, user *models.UserDB) error{
+func (u *userUsecase) Update(c context.Context, user *models.User) error{
 
 	ctx, cancel := context.WithTimeout(c, u.contextTimeout)
 	defer cancel()
@@ -48,7 +48,7 @@ func (u *userUsecase) Update(c context.Context, user *models.UserDB) error{
 }
 
 // fetch all the task in the task database 
-func (u *userUsecase) GetAllUser(c context.Context) ([]*models.UserDB, error){
+func (u *userUsecase) GetAllUser(c context.Context) ([]*models.User, error){
 	 
 	ctx, cancel := context.WithTimeout(c, u.contextTimeout)
 	defer cancel()

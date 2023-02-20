@@ -73,7 +73,7 @@ func (t *TaskHandler) Delete(c echo.Context) error{
 
 func (t *TaskHandler) Store(c echo.Context) error{
 	
-	var task models.TaskDB
+	var task models.Task
 	err := c.Bind(&task)
 	if err != nil{
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
@@ -158,7 +158,7 @@ func (t *TaskHandler)Update(c echo.Context) error {
 	}
 	
 	id := int64(idP)
-	var task models.TaskDB
+	var task models.Task
 	task.ID = id
 	err = c.Bind(&task)
 	if err != nil{
@@ -213,7 +213,7 @@ func (t *TaskHandler) UpdateDone(c echo.Context) error{
 
 func (u *UserHandler) UserStore(c echo.Context) error{
 
-	var user models.UserDB
+	var user models.User
 	err := c.Bind(&user)
 	if err != nil{
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
@@ -245,7 +245,7 @@ func (u *UserHandler)UserUpdate(c echo.Context) error {
 	}
 	
 	id := int64(idP)
-	var user models.UserDB
+	var user models.User
 	user.ID = id
 	err = c.Bind(&user)
 	if err != nil{
@@ -284,7 +284,7 @@ func (u *UserHandler)GetAllUser(c echo.Context) error{
 
 
 // Utility Functions
-func isRequestValid(task *models.TaskDB) (bool, error){
+func isRequestValid(task *models.Task) (bool, error){
 
 	validate := validator.New()
 	err := validate.Struct(task)
@@ -295,7 +295,7 @@ func isRequestValid(task *models.TaskDB) (bool, error){
 	return true, nil
 }
 
-func isUserRequestValid(user *models.UserDB)(bool, error){
+func isUserRequestValid(user *models.User)(bool, error){
 
 	validate := validator.New()
 	err := validate.Struct(user)
