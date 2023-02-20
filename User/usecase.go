@@ -7,9 +7,6 @@ import (
 	
 )
 
-
-
-
 type Usecase interface {
 
 	Store(ctx context.Context, a *models.User) error

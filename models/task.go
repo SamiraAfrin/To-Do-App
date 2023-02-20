@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// TaskDB represent the task model
+// Task represent the task model
 type Task struct {
 	ID        int64      `json:"id" gorm:"primaryKey"`
 	Name   	  string     `json:"name"`
