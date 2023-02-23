@@ -23,5 +23,6 @@ type Usecase interface {
 	Store(ctx context.Context, a *models.Task) error
 	Update(ctx context.Context, a *models.Task) error
 	UpdateDone(ctx context.Context, task_id int64, statusReq *TaskPatchReq) error
+	
 
 }

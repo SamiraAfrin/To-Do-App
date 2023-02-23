@@ -30,7 +30,7 @@ func (t *taskUsecase) Delete(c context.Context, task_id int64) error {
 	defer cancel()
 
 	existedTask, err := t.taskRepo.GetByID(ctx, task_id)
-	if err != nil {
+	if err != nil{
 		return err
 	}
 
@@ -139,4 +139,5 @@ func (t *taskUsecase) UpdateDone(c context.Context, task_id int64, task *Task.Ta
 
 	return nil
 	
-}
+} 
+
