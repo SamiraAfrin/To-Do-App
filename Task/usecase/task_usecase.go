@@ -1,24 +1,22 @@
 package usecase
 
 import (
-
 	"context"
 	"time"
-	
-	"To_Do_App/models"
-	"To_Do_App/Task"
 
+	"To_Do_App/Task"
+	"To_Do_App/models"
 )
 
 type taskUsecase struct {
-	taskRepo 		Task.Repository
-	contextTimeout  time.Duration
+	taskRepo       Task.Repository
+	contextTimeout time.Duration
 }
 
 func NewTaskUsecase(t Task.Repository, timeout time.Duration) Task.Usecase {
 
-	return &taskUsecase {
-		taskRepo: 		t,
+	return &taskUsecase{
+		taskRepo:       t,
 		contextTimeout: timeout,
 	}
 }
@@ -26,11 +24,11 @@ func NewTaskUsecase(t Task.Repository, timeout time.Duration) Task.Usecase {
 // Delete the task using task id
 func (t *taskUsecase) Delete(c context.Context, task_id int64) error {
 
-	ctx, cancel:= context.WithTimeout(c, t.contextTimeout)
+	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
 
 	existedTask, err := t.taskRepo.GetByID(ctx, task_id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -42,13 +40,13 @@ func (t *taskUsecase) Delete(c context.Context, task_id int64) error {
 }
 
 // fetch the task using task id
-func (t *taskUsecase) GetByID(c context.Context, task_id int64) (*models.Task, error){
+func (t *taskUsecase) GetByID(c context.Context, task_id int64) (*models.Task, error) {
 
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
 
 	res, err := t.taskRepo.GetByID(ctx, task_id)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
@@ -57,13 +55,13 @@ func (t *taskUsecase) GetByID(c context.Context, task_id int64) (*models.Task, e
 }
 
 // fetch all the data using the user id
-func (t *taskUsecase) GetByUserID(c context.Context, user_id int64) ([]*models.Task, error){
-	
+func (t *taskUsecase) GetByUserID(c context.Context, user_id int64) ([]*models.Task, error) {
+
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
 
 	res, err := t.taskRepo.GetByUserID(ctx, user_id)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
@@ -71,14 +69,14 @@ func (t *taskUsecase) GetByUserID(c context.Context, user_id int64) ([]*models.T
 
 }
 
-// fetch all the task in the task database 
-func (t *taskUsecase) GetAllTask(c context.Context) ([]*models.Task, error){
-	 
+// fetch all the task in the task database
+func (t *taskUsecase) GetAllTask(c context.Context) ([]*models.Task, error) {
+
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
-	
+
 	res, err := t.taskRepo.GetAllTask(ctx)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
@@ -86,8 +84,8 @@ func (t *taskUsecase) GetAllTask(c context.Context) ([]*models.Task, error){
 }
 
 // Store the data in the task database
-func (t *taskUsecase) Store(c context.Context, task *models.Task) error{
-	
+func (t *taskUsecase) Store(c context.Context, task *models.Task) error {
+
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
 
@@ -96,7 +94,7 @@ func (t *taskUsecase) Store(c context.Context, task *models.Task) error{
 	task.UpdatedAt = task.CreatedAt
 
 	err := t.taskRepo.Store(ctx, task)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -104,7 +102,7 @@ func (t *taskUsecase) Store(c context.Context, task *models.Task) error{
 }
 
 // Update the existing task
-func (t *taskUsecase) Update(c context.Context, task *models.Task) error{
+func (t *taskUsecase) Update(c context.Context, task *models.Task) error {
 
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
@@ -116,28 +114,27 @@ func (t *taskUsecase) Update(c context.Context, task *models.Task) error{
 }
 
 // Update the task status
-func (t *taskUsecase) UpdateDone(c context.Context, task_id int64, task *Task.TaskPatchReq) error{
-	 
+func (t *taskUsecase) UpdateDone(c context.Context, task_id int64, task *Task.TaskPatchReq) error {
+
 	ctx, cancel := context.WithTimeout(c, t.contextTimeout)
 	defer cancel()
 
 	_, err := t.taskRepo.GetByID(ctx, task_id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
 	tm := time.Now()
 	task.UpdatedAt = &tm
 	taskerr := t.taskRepo.UpdateDone(ctx, task_id, &models.Task{
-		ID	  : task_id,
-		Status: task.Status,
+		ID:        task_id,
+		Status:    task.Status,
 		UpdatedAt: task.UpdatedAt,
 	})
-	if taskerr != nil{
+	if taskerr != nil {
 		return taskerr
 	}
 
 	return nil
-	
-} 
 
+}

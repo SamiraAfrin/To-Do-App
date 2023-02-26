@@ -1,20 +1,19 @@
 package repository
 
 import (
-
 	"context"
+
 	"gorm.io/gorm"
 
 	"To_Do_App/User"
 	"To_Do_App/models"
-	
 )
 
 type mysqlUserRepo struct {
 	Conn *gorm.DB
 }
 
-func NewMysqlUserRepo(db *gorm.DB) User.Repository{
+func NewMysqlUserRepo(db *gorm.DB) User.Repository {
 
 	return &mysqlUserRepo{
 		Conn: db,
@@ -22,35 +21,29 @@ func NewMysqlUserRepo(db *gorm.DB) User.Repository{
 }
 
 // Store new data in the database
-func (m *mysqlUserRepo) Store(ctx context.Context, user *models.User) error{
+func (m *mysqlUserRepo) Store(ctx context.Context, user *models.User) error {
 
 	result := m.Conn.Create(&user)
-	
+
 	return result.Error
 
-}	
+}
 
 // Update the existing user
-func (m *mysqlUserRepo) Update(ctx context.Context, user *models.User) error{
+func (m *mysqlUserRepo) Update(ctx context.Context, user *models.User) error {
 
-	result:= m.Conn.Save(&user)
+	result := m.Conn.Save(&user)
 
 	return result.Error
-	
-	
+
 }
 
 // Get all the user in the database
 func (m *mysqlUserRepo) GetAllUser(ctx context.Context) ([]*models.User, error) {
 
 	result := make([]*models.User, 0)
-	d:= m.Conn.Find(&result)
+	d := m.Conn.Find(&result)
 
 	return result, d.Error
 
-	
 }
-
-
-
-

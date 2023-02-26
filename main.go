@@ -45,11 +45,10 @@ func main() {
 	dsn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", viper.GetString(`database.user`),
 		viper.GetString(`database.pass`), viper.GetString(`database.net`), viper.GetString(`database.host`),
 		viper.GetInt(`database.port`), viper.GetString(`database.name`))
-	
+
 	// Get a database handle.
 	var err error
 	dbConn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	
 
 	if err != nil {
 		log.Fatal(err)
@@ -70,7 +69,7 @@ func main() {
 	userUsecase := _userUsecase.NewUserUsecase(userRepo, timeoutContext)
 
 	// //Delivery
-	_taskHttpDelivery.NewTaskHandler(e,taskUsecase,userUsecase)
+	_taskHttpDelivery.NewTaskHandler(e, taskUsecase, userUsecase)
 
 	e.Logger.Fatal(e.Start(viper.GetString("server.address")))
 
