@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -186,6 +187,7 @@ func (t *TaskHandler) UpdateDone(c echo.Context) error {
 
 	idP, err := strconv.Atoi(c.Param("ID"))
 	if err != nil {
+		log.Print(err)
 		return c.JSON(http.StatusNotFound, models.ErrNotFound.Error())
 	}
 
@@ -248,6 +250,8 @@ func (u *UserHandler) UserUpdate(c echo.Context) error {
 	user.ID = id
 	err = c.Bind(&user)
 	if err != nil {
+		log.Print("HELLO")
+		log.Print(err)
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 

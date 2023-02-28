@@ -33,7 +33,7 @@ func TestCreateUser(t *testing.T) {
 	assert.NoError(t, err)
 
 	mockUCase := new(userMock.Usecase)
-	spew.Dump(mock.Anything, mock.AnythingOfType("*models.User"), "hello")
+	//spew.Dump(mock.Anything, mock.AnythingOfType("*models.User"), "hello")
 	mockUCase.On("Store", mock.Anything, mock.AnythingOfType("*models.User")).Return(nil)
 
 	e := echo.New()
@@ -89,15 +89,23 @@ func TestUserUpdate(t *testing.T) {
 	err := faker.FakeData(&mockUser)
 	assert.NoError(t, err)
 
+	j, err := json.Marshal(mockUser)
+	assert.NoError(t, err)
+	spew.Dump(j)
+
 	mockUCase := new(userMock.Usecase)
 
 	num := int(mockUser.ID)
-	spew.Dump(mock.Anything, mock.AnythingOfType("*models.User"))
+	spew.Dump(num)
+	spew.Dump(mockUser)
+	//spew.Dump(mock.Anything, mock.AnythingOfType("*models.User"))
 	mockUCase.On("Update", mock.Anything, mock.AnythingOfType("*models.User")).Return(nil)
 
 	e := echo.New()
-	req, err := http.NewRequest(echo.PUT, "/users/"+strconv.Itoa(num), strings.NewReader(""))
+
+	req, err := http.NewRequest(echo.PUT, "/users/"+strconv.Itoa(num), strings.NewReader(string(j)))
 	assert.NoError(t, err)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -214,102 +222,109 @@ func TestGetAllTask(t *testing.T) {
 
 }
 
-//func TestGetTasksByUserID(t *testing.T) {
-//	var mockTask models.Task
-//	err := faker.FakeData(&mockTask)
-//	assert.NoError(t, err)
-//
-//	mockUCase := new(mocks.Usecase)
-//	mockListTask := make([]*models.Task, 0)
-//	mockListTask = append(mockListTask, &mockTask)
-//	userID := 1
-//	mockUCase.On("GetByUserID", mock.Anything, int64(userID)).Return(mockListTask, nil)
-//
-//	e := echo.New()
-//	req, err := http.NewRequest(echo.GET, "/tasks/user/"+strconv.Itoa(userID), strings.NewReader(""))
-//	assert.NoError(t, err)
-//
-//	rec := httptest.NewRecorder()
-//	c := e.NewContext(req, rec)
-//	handler := TaskHandler{
-//		TaskUsecase: mockUCase,
-//	}
-//	err = handler.GetByUserID(c)
-//	require.NoError(t, err)
-//
-//	assert.Equal(t, http.StatusOK, rec.Code)
-//	mockUCase.AssertExpectations(t)
-//
-//}
+func TestDelete(t *testing.T) {
+	var mockTask models.Task
+	err := faker.FakeData(&mockTask)
+	assert.NoError(t, err)
 
-//func TestDelete(t *testing.T) {
-//	var mockTask models.Task
-//	err := faker.FakeData(&mockTask)
-//	assert.NoError(t, err)
-//
-//	mockUCase := new(mocks.Usecase)
-//
-//	num := int(mockTask.ID)
-//
-//	//mockUCase.On("GetByID", mock.Anything, int64(num)).Return(nil)
-//	mockUCase.On("Delete", mock.Anything, int64(num)).Return(nil)
-//
-//	e := echo.New()
-//
-//	req, err := http.NewRequest(echo.DELETE, "/tasks/"+strconv.Itoa(num), strings.NewReader(""))
-//	assert.NoError(t, err)
-//
-//	rec := httptest.NewRecorder()
-//	c := e.NewContext(req, rec)
-//	c.SetPath("tasks/:id")
-//	c.SetParamNames("id")
-//	c.SetParamValues(strconv.Itoa(num))
-//	handler := TaskHandler{
-//		TaskUsecase: mockUCase,
-//	}
-//	err = handler.Delete(c)
-//	require.NoError(t, err)
-//
-//	assert.Equal(t, http.StatusOK, rec.Code)
-//	mockUCase.AssertExpectations(t)
-//}
-//func TestUpdate(t *testing.T) {
-//	nowTime := time.Now().UTC()
-//	mockTask := models.Task{
-//		Name:      "Hello",
-//		Status:    "progress",
-//		Comment:   "kisu nai",
-//		UpdatedAt: &nowTime,
-//		UserID:    2,
-//	}
-//	num := int(mockTask.ID)
-//	j, err := json.Marshal(mockTask)
-//	assert.NoError(t, err)
-//
-//	mockUCase := new(mocks.Usecase)
-//	mockUCase.On("Update", mock.Anything, mock.AnythingOfType("*models.Task")).Return(nil)
-//
-//	e := echo.New()
-//	req, err := http.NewRequest(echo.PUT, "/tasks/"+strconv.Itoa(num), strings.NewReader(string(j)))
-//	assert.NoError(t, err)
-//	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-//
-//	rec := httptest.NewRecorder()
-//	c := e.NewContext(req, rec)
-//	c.SetPath("tasks/:id")
-//	c.SetParamNames("id")
-//	c.SetParamValues(strconv.Itoa(num))
-//
-//	handler := TaskHandler{
-//		TaskUsecase: mockUCase,
-//	}
-//	err = handler.Update(c)
-//	require.NoError(t, err)
-//
-//	assert.Equal(t, http.StatusCreated, rec.Code)
-//	mockUCase.AssertExpectations(t)
-//
-//}
+	mockUCase := new(mocks.Usecase)
+
+	num := int(mockTask.ID)
+
+	//mockUCase.On("GetByID", mock.Anything, int64(num)).Return(nil)
+	mockUCase.On("Delete", mock.Anything, int64(num)).Return(nil)
+
+	e := echo.New()
+
+	req, err := http.NewRequest(echo.DELETE, "/tasks/"+strconv.Itoa(num), strings.NewReader(""))
+	assert.NoError(t, err)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("tasks/:ID")
+	c.SetParamNames("ID")
+	c.SetParamValues(strconv.Itoa(num))
+	handler := TaskHandler{
+		TaskUsecase: mockUCase,
+	}
+	err = handler.Delete(c)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	mockUCase.AssertExpectations(t)
+}
+
+func TestGetTasksByUserID(t *testing.T) {
+	var mockTask models.Task
+	err := faker.FakeData(&mockTask)
+	assert.NoError(t, err)
+
+	mockUCase := new(mocks.Usecase)
+	mockListTask := make([]*models.Task, 0)
+
+	mockListTask = append(mockListTask, &mockTask)
+	userID := int(mockTask.UserID)
+	mockUCase.On("GetByUserID", mock.Anything, int64(userID)).Return(mockListTask, nil)
+
+	e := echo.New()
+	req, err := http.NewRequest(echo.GET, "/tasks/user/"+strconv.Itoa(userID), strings.NewReader(""))
+	assert.NoError(t, err)
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+	c.SetPath("tasks/user/:userID")
+	c.SetParamNames("userID")
+	c.SetParamValues(strconv.Itoa(userID))
+
+	handler := TaskHandler{
+		TaskUsecase: mockUCase,
+	}
+	err = handler.GetByUserID(c)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	mockUCase.AssertExpectations(t)
+
+}
+
+func TestUpdate(t *testing.T) {
+	nowTime := time.Now().UTC()
+	mockTask := models.Task{
+		Name:      "Hello",
+		Status:    "progress",
+		Comment:   "kisu nai",
+		UpdatedAt: &nowTime,
+		UserID:    2,
+	}
+	num := int(mockTask.ID)
+	j, err := json.Marshal(mockTask)
+	assert.NoError(t, err)
+
+	mockUCase := new(mocks.Usecase)
+	mockUCase.On("Update", mock.Anything, mock.AnythingOfType("*models.Task")).Return(nil)
+
+	e := echo.New()
+	req, err := http.NewRequest(echo.PUT, "/tasks/"+strconv.Itoa(num), strings.NewReader(string(j)))
+	assert.NoError(t, err)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("tasks/:ID")
+	c.SetParamNames("ID")
+	c.SetParamValues(strconv.Itoa(num))
+
+	handler := TaskHandler{
+		TaskUsecase: mockUCase,
+	}
+	err = handler.Update(c)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	mockUCase.AssertExpectations(t)
+
+}
 
 //func TestCompleteTask(t *testing.T) {
 //	nowTime := time.Now().UTC()
@@ -335,8 +350,8 @@ func TestGetAllTask(t *testing.T) {
 //
 //	rec := httptest.NewRecorder()
 //	c := e.NewContext(req, rec)
-//	c.SetPath("tasks/:id")
-//	c.SetParamNames("id")
+//	c.SetPath("tasks/:ID")
+//	c.SetParamNames("ID")
 //	c.SetParamValues(strconv.Itoa(num))
 //
 //	handler := TaskHandler{
@@ -345,7 +360,7 @@ func TestGetAllTask(t *testing.T) {
 //	err = handler.UpdateDone(c)
 //	require.NoError(t, err)
 //
-//	assert.Equal(t, http.StatusCreated, rec.Code)
+//	assert.Equal(t, http.StatusOK, rec.Code)
 //	mockUCase.AssertExpectations(t)
 //
 //}
