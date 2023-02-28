@@ -4,17 +4,18 @@ import (
 	"To_Do_App/Task/mocks"
 	"To_Do_App/models"
 	"encoding/json"
-	"github.com/go-faker/faker/v4"
-	"github.com/labstack/echo"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-faker/faker/v4"
+	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCreateTask(t *testing.T) {

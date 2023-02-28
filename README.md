@@ -72,3 +72,13 @@ $ curl localhost:8000/tasks
 # All the api patterns are mentioned in the following path
 - To-Do-App/Task/delivery/http/task_handler.go
 ```
+# Unit Test
+### To create mocks file, use mockery tools
+[Mockery Site](https://vektra.github.io/mockery/)
+
+```
+# To run all the test files from the roor directory
+$ go test -v ./...
+# to run specific test files,specify the exact location
+$ go test -v ./Task/usecase/ 
+```
