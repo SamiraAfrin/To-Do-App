@@ -84,4 +84,5 @@ func TestUpdate(t *testing.T) {
 		assert.NoError(t, err)
 		mockUserRepo.AssertExpectations(t)
 	})
+
 }
