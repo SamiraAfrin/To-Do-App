@@ -1,6 +1,7 @@
 package http
 
 import (
+	"To_Do_App/Task"
 	"To_Do_App/Task/mocks"
 	userMock "To_Do_App/User/mocks"
 	"To_Do_App/models"
@@ -326,41 +327,39 @@ func TestUpdate(t *testing.T) {
 
 }
 
-//func TestCompleteTask(t *testing.T) {
-//	nowTime := time.Now().UTC()
-//
-//	mockTask := models.Task{}
-//	modelTask := &Task.TaskPatchReq{
-//		Status:    "pending",
-//		UpdatedAt: &nowTime,
-//	}
-//	mockTask.Status = modelTask.Status
-//	mockTask.UpdatedAt = modelTask.UpdatedAt
-//	num := int(mockTask.ID)
-//	j, err := json.Marshal(mockTask)
-//	assert.NoError(t, err)
-//
-//	mockUCase := new(mocks.Usecase)
-//	mockUCase.On("UpdateDone", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("*models.Task")).Return(nil)
-//
-//	e := echo.New()
-//	req, err := http.NewRequest(echo.PATCH, "/tasks/"+strconv.Itoa(num), strings.NewReader(string(j)))
-//	assert.NoError(t, err)
-//	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-//
-//	rec := httptest.NewRecorder()
-//	c := e.NewContext(req, rec)
-//	c.SetPath("tasks/:ID")
-//	c.SetParamNames("ID")
-//	c.SetParamValues(strconv.Itoa(num))
-//
-//	handler := TaskHandler{
-//		TaskUsecase: mockUCase,
-//	}
-//	err = handler.UpdateDone(c)
-//	require.NoError(t, err)
-//
-//	assert.Equal(t, http.StatusOK, rec.Code)
-//	mockUCase.AssertExpectations(t)
-//
-//}
+func TestCompleteTask(t *testing.T) {
+	nowTime := time.Now().UTC()
+
+	mockTask := &Task.TaskPatchReq{
+		Status:    "pending",
+		UpdatedAt: &nowTime,
+	}
+
+	num := int(1)
+	j, err := json.Marshal(mockTask)
+	assert.NoError(t, err)
+
+	mockUCase := new(mocks.Usecase)
+	mockUCase.On("UpdateDone", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("*Task.TaskPatchReq")).Return(nil)
+
+	e := echo.New()
+	req, err := http.NewRequest(echo.PATCH, "/tasks/"+strconv.Itoa(num), strings.NewReader(string(j)))
+	assert.NoError(t, err)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("tasks/:ID")
+	c.SetParamNames("ID")
+	c.SetParamValues(strconv.Itoa(num))
+
+	handler := TaskHandler{
+		TaskUsecase: mockUCase,
+	}
+	err = handler.UpdateDone(c)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	mockUCase.AssertExpectations(t)
+
+}
