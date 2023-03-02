@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"github.com/davecgh/go-spew/spew"
 
 	"gorm.io/gorm"
 
@@ -88,7 +89,8 @@ func (m *mysqlTaskRepo) Update(ctx context.Context, task *models.Task) error {
 
 // Patch --> only status update
 func (m *mysqlTaskRepo) UpdateDone(ctx context.Context, task_id int64, task *models.Task) error {
-
+	spew.Dump("Task Update")
+	spew.Dump(task)
 	result := m.Conn.Model(&task).Select("Status", "UpdatedAt").Updates(models.Task{Status: task.Status, UpdatedAt: task.UpdatedAt})
 
 	return result.Error

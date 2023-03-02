@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"log"
 	"time"
 
@@ -45,7 +46,8 @@ func main() {
 	dsn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", viper.GetString(`database.user`),
 		viper.GetString(`database.pass`), viper.GetString(`database.net`), viper.GetString(`database.host`),
 		viper.GetInt(`database.port`), viper.GetString(`database.name`))
-
+	log.Print("from main")
+	spew.Dump(dsn)
 	// Get a database handle.
 	var err error
 	dbConn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
