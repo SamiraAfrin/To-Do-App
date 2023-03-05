@@ -71,7 +71,7 @@ func main() {
 	userUsecase := _userUsecase.NewUserUsecase(userRepo, timeoutContext)
 
 	// //Delivery
-	_taskHttpDelivery.NewTaskHandler(e, taskUsecase, userUsecase)
+	_, _ = _taskHttpDelivery.NewTaskHandler(e, taskUsecase, userUsecase)
 
 	e.Logger.Fatal(e.Start(viper.GetString("server.address")))
 

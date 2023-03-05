@@ -3,7 +3,6 @@ package it_test
 import (
 	"To_Do_App/Task/repository"
 	"To_Do_App/models"
-	"github.com/davecgh/go-spew/spew"
 	"time"
 )
 
@@ -89,9 +88,9 @@ func (m *MysqlRepositoryTestSuite) TestMysqlTaskRepository_GetByUserID() {
 	r := repository.NewMysqlTaskRepo(m.gormDB)
 	m.Assert().NoError(r.Store(m.ctx, firstTask))
 
-	result, err := r.GetByUserID(m.ctx, firstTask.UserID) // count checking a pb
+	_, err := r.GetByUserID(m.ctx, firstTask.UserID) // count checking a pb
 	m.Assert().NoError(err)
-	spew.Dump(len(result))
+	//spew.Dump(len(result))
 }
 
 func (m *MysqlRepositoryTestSuite) TestMysqlTaskRepository_Delete() {

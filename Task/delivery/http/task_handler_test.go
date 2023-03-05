@@ -6,7 +6,6 @@ import (
 	userMock "To_Do_App/User/mocks"
 	"To_Do_App/models"
 	"encoding/json"
-	"github.com/davecgh/go-spew/spew"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -92,14 +91,14 @@ func TestUserUpdate(t *testing.T) {
 
 	j, err := json.Marshal(mockUser)
 	assert.NoError(t, err)
-	spew.Dump(j)
+	//spew.Dump(j)
 
 	mockUCase := new(userMock.Usecase)
 
 	num := int(mockUser.ID)
-	spew.Dump(num)
-	spew.Dump(mockUser)
-	//spew.Dump(mock.Anything, mock.AnythingOfType("*models.User"))
+	//spew.Dump(num)
+	//spew.Dump(mockUser)
+	////spew.Dump(mock.Anything, mock.AnythingOfType("*models.User"))
 	mockUCase.On("Update", mock.Anything, mock.AnythingOfType("*models.User")).Return(nil)
 
 	e := echo.New()

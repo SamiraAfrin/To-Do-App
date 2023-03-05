@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -27,7 +26,7 @@ type UserHandler struct {
 	UserUsecase User.Usecase
 }
 
-func NewTaskHandler(e *echo.Echo, task Task.Usecase, user User.Usecase) {
+func NewTaskHandler(e *echo.Echo, task Task.Usecase, user User.Usecase) (*TaskHandler, *UserHandler) {
 
 	taskhandler := &TaskHandler{
 		TaskUsecase: task,
@@ -48,6 +47,7 @@ func NewTaskHandler(e *echo.Echo, task Task.Usecase, user User.Usecase) {
 	e.PUT("users/:ID", userhandler.UserUpdate)
 	e.GET("users", userhandler.GetAllUser)
 
+	return taskhandler, userhandler
 }
 
 func (t *TaskHandler) Delete(c echo.Context) error {
@@ -187,7 +187,7 @@ func (t *TaskHandler) UpdateDone(c echo.Context) error {
 
 	idP, err := strconv.Atoi(c.Param("ID"))
 	if err != nil {
-		log.Print(err)
+		//log.Print(err)
 		return c.JSON(http.StatusNotFound, models.ErrNotFound.Error())
 	}
 
@@ -250,8 +250,8 @@ func (u *UserHandler) UserUpdate(c echo.Context) error {
 	user.ID = id
 	err = c.Bind(&user)
 	if err != nil {
-		log.Print("HELLO")
-		log.Print(err)
+		//log.Print("HELLO")
+		//log.Print(err)
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 
