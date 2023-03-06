@@ -35,8 +35,17 @@ func (s *Server) Start() {
 	userUsecase := _userUsecase.NewUserUsecase(userRepo, timeoutContext)
 
 	e := echo.New()
-	_taskhandler, _ := _taskHttpDelivery.NewTaskHandler(e, taskUsecase, userUsecase)
+	_taskhandler, _userhandler := _taskHttpDelivery.NewTaskHandler(e, taskUsecase, userUsecase)
 	e.POST("/tasks", _taskhandler.Store)
+	e.GET("tasks", _taskhandler.GetAllTask)
+	e.GET("/tasks/:ID", _taskhandler.GetByID)
+	e.GET("/tasks/user/:userID", _taskhandler.GetByUserID)
+	e.DELETE("/tasks/:ID", _taskhandler.Delete)
+	e.PUT("tasks/:ID", _taskhandler.Update)
+
+	e.POST("/users", _userhandler.UserStore)
+	e.PUT("users/:ID", _userhandler.UserUpdate)
+	e.GET("users", _userhandler.GetAllUser)
 
 	go func() {
 		if err := e.Start(appPort); err != nil {
