@@ -23,19 +23,24 @@ type Server struct {
 }
 
 func (s *Server) Start() {
+
 	appPort := fmt.Sprintf(":%d", 8000)
 
+	//Repository
 	taskRepo := taskRepo.NewMysqlTaskRepo(s.DBConn)
 	userRepo := userRepo.NewMysqlUserRepo(s.DBConn)
 
-	// //Usecase
+	//Usecase
 	timeoutContext := 10 * time.Second
 	taskUsecase := _taskUsecase.NewTaskUsecase(taskRepo, timeoutContext)
-	// fmt.Println(taskUsecase)
 	userUsecase := _userUsecase.NewUserUsecase(userRepo, timeoutContext)
 
 	e := echo.New()
+
+	// Delivery
 	_taskhandler, _userhandler := _taskHttpDelivery.NewTaskHandler(e, taskUsecase, userUsecase)
+
+	// For Task
 	e.POST("/tasks", _taskhandler.Store)
 	e.GET("/tasks/:ID", _taskhandler.GetByID)
 	e.GET("tasks", _taskhandler.GetAllTask)
@@ -43,6 +48,7 @@ func (s *Server) Start() {
 	e.DELETE("/tasks/:ID", _taskhandler.Delete)
 	e.PUT("tasks/:ID", _taskhandler.Update)
 
+	// For User
 	e.POST("/users", _userhandler.UserStore)
 	e.PUT("users/:ID", _userhandler.UserUpdate)
 	e.GET("users", _userhandler.GetAllUser)
@@ -67,5 +73,4 @@ func (s *Server) Start() {
 	if err := e.Shutdown(ctx); err != nil {
 		logrus.Fatalf("failed to gracefully shutdown the server: %s", err)
 	}
-
 }

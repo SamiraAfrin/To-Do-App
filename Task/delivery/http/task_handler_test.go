@@ -1,10 +1,6 @@
 package http
 
 import (
-	"To_Do_App/Task"
-	"To_Do_App/Task/mocks"
-	userMock "To_Do_App/User/mocks"
-	"To_Do_App/models"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +8,11 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"To_Do_App/Task"
+	"To_Do_App/Task/mocks"
+	userMock "To_Do_App/User/mocks"
+	"To_Do_App/models"
 
 	"github.com/go-faker/faker/v4"
 	"github.com/labstack/echo"
@@ -22,6 +23,7 @@ import (
 
 // for the user
 func TestCreateUser(t *testing.T) {
+
 	mockUser := models.User{
 		Name: "Hello",
 	}
@@ -33,7 +35,6 @@ func TestCreateUser(t *testing.T) {
 	assert.NoError(t, err)
 
 	mockUCase := new(userMock.Usecase)
-	//spew.Dump(mock.Anything, mock.AnythingOfType("*models.User"), "hello")
 	mockUCase.On("Store", mock.Anything, mock.AnythingOfType("*models.User")).Return(nil)
 
 	e := echo.New()
@@ -57,6 +58,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetAllUser(t *testing.T) {
+
 	var mockUser models.User
 	err := faker.FakeData(&mockUser)
 	assert.NoError(t, err)
@@ -85,20 +87,17 @@ func TestGetAllUser(t *testing.T) {
 }
 
 func TestUserUpdate(t *testing.T) {
+
 	var mockUser models.User
 	err := faker.FakeData(&mockUser)
 	assert.NoError(t, err)
 
 	j, err := json.Marshal(mockUser)
 	assert.NoError(t, err)
-	//spew.Dump(j)
 
 	mockUCase := new(userMock.Usecase)
 
 	num := int(mockUser.ID)
-	//spew.Dump(num)
-	//spew.Dump(mockUser)
-	////spew.Dump(mock.Anything, mock.AnythingOfType("*models.User"))
 	mockUCase.On("Update", mock.Anything, mock.AnythingOfType("*models.User")).Return(nil)
 
 	e := echo.New()
@@ -120,10 +119,10 @@ func TestUserUpdate(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	mockUCase.AssertExpectations(t)
+
 }
 
 // for the task
-
 func TestCreateTask(t *testing.T) {
 
 	nowTime := time.Now().UTC()
@@ -166,6 +165,7 @@ func TestCreateTask(t *testing.T) {
 }
 
 func TestGetTaskByID(t *testing.T) {
+
 	var mockTask models.Task
 	err := faker.FakeData(&mockTask)
 	assert.NoError(t, err)
@@ -192,9 +192,11 @@ func TestGetTaskByID(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	mockUCase.AssertExpectations(t)
+
 }
 
 func TestGetAllTask(t *testing.T) {
+
 	var mockTask models.Task
 	err := faker.FakeData(&mockTask)
 	assert.NoError(t, err)
@@ -223,6 +225,7 @@ func TestGetAllTask(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
+
 	var mockTask models.Task
 	err := faker.FakeData(&mockTask)
 	assert.NoError(t, err)
@@ -231,7 +234,6 @@ func TestDelete(t *testing.T) {
 
 	num := int(mockTask.ID)
 
-	//mockUCase.On("GetByID", mock.Anything, int64(num)).Return(nil)
 	mockUCase.On("Delete", mock.Anything, int64(num)).Return(nil)
 
 	e := echo.New()
@@ -252,9 +254,11 @@ func TestDelete(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	mockUCase.AssertExpectations(t)
+
 }
 
 func TestGetTasksByUserID(t *testing.T) {
+
 	var mockTask models.Task
 	err := faker.FakeData(&mockTask)
 	assert.NoError(t, err)
@@ -289,6 +293,7 @@ func TestGetTasksByUserID(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
+
 	nowTime := time.Now().UTC()
 	mockTask := models.Task{
 		Name:      "Hello",
@@ -297,7 +302,9 @@ func TestUpdate(t *testing.T) {
 		UpdatedAt: &nowTime,
 		UserID:    2,
 	}
+
 	num := int(mockTask.ID)
+
 	j, err := json.Marshal(mockTask)
 	assert.NoError(t, err)
 
@@ -327,6 +334,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestCompleteTask(t *testing.T) {
+
 	nowTime := time.Now().UTC()
 
 	mockTask := &Task.TaskPatchReq{
@@ -335,6 +343,7 @@ func TestCompleteTask(t *testing.T) {
 	}
 
 	num := int(1)
+
 	j, err := json.Marshal(mockTask)
 	assert.NoError(t, err)
 

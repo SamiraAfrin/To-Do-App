@@ -1,26 +1,26 @@
 package usecase
 
 import (
-	//"To_Do_App/User"
-	"To_Do_App/User/mocks"
-	"To_Do_App/models"
 	"context"
 	"errors"
-
-	//"errors"
 	"testing"
 	"time"
+
+	"To_Do_App/User/mocks"
+	"To_Do_App/models"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestCreateUser(t *testing.T) {
+
 	mockUserRepo := new(mocks.Repository)
 
 	mockUser := models.User{
 		Name: "First User",
 	}
+
 	t.Run("success", func(t *testing.T) {
 		tMockUser := mockUser
 		tMockUser.ID = 1
@@ -38,6 +38,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetAllUser(t *testing.T) {
+
 	mockUserRepo := new(mocks.Repository)
 	mockUser := &models.User{}
 	mockListUser := make([]*models.User, 0)
@@ -67,7 +68,8 @@ func TestGetAllUser(t *testing.T) {
 	})
 }
 
-func TestUpdate(t *testing.T) {
+func TestUserUpdate(t *testing.T) {
+
 	mockUserRepo := new(mocks.Repository)
 	mockUser := &models.User{
 		Name: "Update name",
@@ -84,5 +86,4 @@ func TestUpdate(t *testing.T) {
 		assert.NoError(t, err)
 		mockUserRepo.AssertExpectations(t)
 	})
-
 }

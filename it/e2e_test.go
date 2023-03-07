@@ -1,23 +1,25 @@
 package it_test
 
 import (
-	"To_Do_App/Task"
-	"To_Do_App/models"
-	"To_Do_App/server"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
-	"github.com/labstack/echo"
-	"github.com/stretchr/testify/suite"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"io"
 	"log"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"To_Do_App/Task"
+	"To_Do_App/models"
+	"To_Do_App/server"
+
+	"github.com/davecgh/go-spew/spew"
+	"github.com/labstack/echo"
+	"github.com/stretchr/testify/suite"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 type e2eTestSuite struct {
@@ -28,14 +30,16 @@ type e2eTestSuite struct {
 }
 
 func TestE2ETestSuite(t *testing.T) {
+
 	suite.Run(t, &e2eTestSuite{})
 }
 
 func (s *e2eTestSuite) SetupSuite() {
+
 	s.dbConnectionStr = "root:123@tcp(localhost:3306)/recordings?charset=utf8&parseTime=True&loc=Local"
 	var err error
 	s.dbConn, err = gorm.Open(mysql.Open(s.dbConnectionStr), &gorm.Config{})
-	//s.Require().Error(err)
+
 	if err != nil {
 		log.Fatal("Can't connect to mysql", err)
 	}
@@ -49,18 +53,21 @@ func (s *e2eTestSuite) SetupSuite() {
 	}
 	go server.Start()
 	<-serverReady
+
 }
 
 func (s *e2eTestSuite) TearDownSuite() {
 }
 func (s *e2eTestSuite) SetupTest() {
+
 	s.port = 8000
 }
 func (s *e2eTestSuite) TearDownTest() {
 }
 
 func (s *e2eTestSuite) Test_EndToEnd_CreateTask() {
-	reqStr := `{"name":"Task1", "status": "Cholche gari jatrabari", "comment":"kichu j bolar nai", "updated_at": "2023-02-20T09:31:34+06:00", "created_at": "2023-02-20T09:31:34+06:00", "user_id": 2}`
+
+	reqStr := `{"name": "Task1", "status": "Cholche gari jatrabari", "comment": "kichu j bolar nai", "updated_at": "2023-02-20T09:31:34+06:00", "created_at": "2023-02-20T09:31:34+06:00", "user_id": 2}`
 	req, err := http.NewRequest(echo.POST, fmt.Sprintf("http://localhost:%d/tasks", s.port), strings.NewReader(reqStr))
 	s.NoError(err)
 
@@ -89,9 +96,13 @@ func (s *e2eTestSuite) Test_EndToEnd_CreateTask() {
 	s.Equal(tres.Comment, treq.Comment)
 	s.Equal(tres.Status, treq.Status)
 	s.Equal(tres.UserID, treq.UserID)
+
 	response.Body.Close()
+
 }
+
 func (s *e2eTestSuite) Test_EndToEnd_GetTaskByTaskID() {
+
 	nowTime := time.Now().UTC()
 	task := models.Task{
 		Name:      "First Task",
@@ -129,9 +140,11 @@ func (s *e2eTestSuite) Test_EndToEnd_GetTaskByTaskID() {
 	s.Equal(tres.UserID, task.UserID)
 
 	response.Body.Close()
+
 }
 
 func (s *e2eTestSuite) Test_EndToEnd_GetAllTask() {
+
 	nowTime := time.Now().UTC()
 	task := models.Task{
 		Name:      "First Task",
@@ -141,6 +154,7 @@ func (s *e2eTestSuite) Test_EndToEnd_GetAllTask() {
 		CreatedAt: &nowTime,
 		UserID:    1,
 	}
+
 	s.NoError(s.dbConn.Create(&task).Error)
 	req, err := http.NewRequest(echo.GET, fmt.Sprintf("http://localhost:%d/tasks", s.port), nil)
 	s.NoError(err)
@@ -161,9 +175,11 @@ func (s *e2eTestSuite) Test_EndToEnd_GetAllTask() {
 	}
 
 	response.Body.Close()
+
 }
 
 func (s *e2eTestSuite) Test_EndToEnd_GetTasksByUserID() {
+
 	nowTime := time.Now().UTC()
 	task := models.Task{
 		Name:      "First Task",
@@ -173,6 +189,7 @@ func (s *e2eTestSuite) Test_EndToEnd_GetTasksByUserID() {
 		CreatedAt: &nowTime,
 		UserID:    1,
 	}
+
 	s.NoError(s.dbConn.Create(&task).Error)
 	tasks := GetAllTask()
 	t := tasks[0]
@@ -196,9 +213,11 @@ func (s *e2eTestSuite) Test_EndToEnd_GetTasksByUserID() {
 	}
 
 	response.Body.Close()
+
 }
 
 func (s *e2eTestSuite) Test_EndToEnd_DeleteTaskByID() {
+
 	nowTime := time.Now().UTC()
 	task := models.Task{
 		Name:      "First Task",
@@ -208,6 +227,7 @@ func (s *e2eTestSuite) Test_EndToEnd_DeleteTaskByID() {
 		CreatedAt: &nowTime,
 		UserID:    1,
 	}
+
 	s.NoError(s.dbConn.Create(&task).Error)
 	tasks := GetAllTask()
 
@@ -233,14 +253,12 @@ func (s *e2eTestSuite) Test_EndToEnd_DeleteTaskByID() {
 	}
 	s.Equal(http.StatusOK, response.StatusCode)
 
-	//For checking
-	// tasks = GetAllTask()
-	//t = tasks[0]
-	//spew.Dump(t.ID)
 	response.Body.Close()
+
 }
 
 func (s *e2eTestSuite) Test_EndToEnd_UpdateTaskByID() {
+
 	nowTime := time.Now().UTC()
 	task := models.Task{
 		Name:      "First Taskss",
@@ -258,11 +276,12 @@ func (s *e2eTestSuite) Test_EndToEnd_UpdateTaskByID() {
 		CreatedAt: &nowTime,
 		UserID:    2,
 	}
+
 	s.NoError(s.dbConn.Create(&task).Error)
 	tasks := GetAllTask()
 
 	// will update last inserted data
-	t := tasks[len(tasks)-1]
+	t := tasks[0]
 	updatedTask.ID = t.ID
 	b, err := json.Marshal(&updatedTask)
 	s.NoError(err)
@@ -277,7 +296,6 @@ func (s *e2eTestSuite) Test_EndToEnd_UpdateTaskByID() {
 	s.Equal(http.StatusOK, response.StatusCode)
 
 	byteBody, err := io.ReadAll(response.Body)
-	//spew.Dump(string(byteBody))
 	s.NoError(err)
 
 	var tres models.Task // response
@@ -289,15 +307,12 @@ func (s *e2eTestSuite) Test_EndToEnd_UpdateTaskByID() {
 	}
 	s.Equal(http.StatusOK, response.StatusCode)
 
-	//For checking
-	//tasks = GetAllTask()
-	//t = tasks[0]
-	//spew.Dump(t.ID)
-	//spew.Dump(t.Name)
 	response.Body.Close()
+
 }
 
 func (s *e2eTestSuite) Test_EndToEnd_CompleteUpdateTaskByID() {
+
 	nowTime := time.Now().UTC()
 	task := models.Task{
 		Name:      "First Taskss",
@@ -311,6 +326,7 @@ func (s *e2eTestSuite) Test_EndToEnd_CompleteUpdateTaskByID() {
 		Status:    "Done",
 		UpdatedAt: &nowTime,
 	}
+
 	s.NoError(s.dbConn.Create(&task).Error)
 	tasks := GetAllTask()
 
@@ -318,9 +334,6 @@ func (s *e2eTestSuite) Test_EndToEnd_CompleteUpdateTaskByID() {
 	t := tasks[0]
 	b, err := json.Marshal(&updatedTask)
 	s.NoError(err)
-	//testing
-	spew.Dump(t.ID)
-	spew.Dump(t.Status)
 
 	req, err := http.NewRequest(echo.PATCH, fmt.Sprintf("http://localhost:%d/tasks/%d", s.port, t.ID), bytes.NewReader(b))
 	s.NoError(err)
@@ -332,7 +345,6 @@ func (s *e2eTestSuite) Test_EndToEnd_CompleteUpdateTaskByID() {
 	s.Equal(http.StatusOK, response.StatusCode)
 
 	byteBody, err := io.ReadAll(response.Body)
-	//spew.Dump(string(byteBody))
 	s.NoError(err)
 
 	var tres models.Task // response
@@ -344,15 +356,12 @@ func (s *e2eTestSuite) Test_EndToEnd_CompleteUpdateTaskByID() {
 	}
 	s.Equal(http.StatusOK, response.StatusCode)
 
-	//For checking
-	//tasks = GetAllTask()
-	//t = tasks[0]
-	//spew.Dump(t.ID)
-	//spew.Dump(t.Status)
 	response.Body.Close()
+
 }
 
-func GetAllTask() ([]models.Task) {
+func GetAllTask() []models.Task {
+
 	req, err := http.NewRequest(echo.GET, fmt.Sprintf("http://localhost:%d/tasks", 8000), nil)
 
 	if err != nil {
@@ -379,8 +388,11 @@ func GetAllTask() ([]models.Task) {
 	}
 	response.Body.Close()
 	return tres
+
 }
+
 func (s *e2eTestSuite) Test_EndToEnd_CreateUser() {
+
 	reqStr := `{"name":"User1"}`
 	req, err := http.NewRequest(echo.POST, fmt.Sprintf("http://localhost:%d/users", s.port), strings.NewReader(reqStr))
 	s.NoError(err)
@@ -407,13 +419,17 @@ func (s *e2eTestSuite) Test_EndToEnd_CreateUser() {
 		log.Fatal("err caught")
 	}
 	s.Equal(tres.Name, treq.Name)
+
 	response.Body.Close()
+
 }
 
 func (s *e2eTestSuite) Test_EndToEnd_GetAllUser() {
+
 	user := models.User{
 		Name: "First User",
 	}
+
 	s.NoError(s.dbConn.Create(&user).Error)
 	req, err := http.NewRequest(echo.GET, fmt.Sprintf("http://localhost:%d/users", s.port), nil)
 	s.NoError(err)
@@ -427,6 +443,7 @@ func (s *e2eTestSuite) Test_EndToEnd_GetAllUser() {
 
 	byteBody, err := io.ReadAll(response.Body)
 	s.NoError(err)
+
 	var tres []models.Task // response
 	err = json.Unmarshal(byteBody, &tres)
 	if err != nil {
@@ -434,15 +451,18 @@ func (s *e2eTestSuite) Test_EndToEnd_GetAllUser() {
 	}
 
 	response.Body.Close()
+
 }
 
 func (s *e2eTestSuite) Test_EndToEnd_UpdateUserByUserID() {
+
 	user := models.User{
 		Name: "First User",
 	}
 	updatedUser := models.User{
 		Name: "Updated User",
 	}
+
 	s.NoError(s.dbConn.Create(&user).Error)
 	users := GetAllUser()
 
@@ -451,10 +471,7 @@ func (s *e2eTestSuite) Test_EndToEnd_UpdateUserByUserID() {
 	updatedUser.ID = u.ID
 	b, err := json.Marshal(&updatedUser)
 	s.NoError(err)
-	//testing
-	spew.Dump(u.ID)
-	spew.Dump(u.Name)
-	//
+
 	req, err := http.NewRequest(echo.PUT, fmt.Sprintf("http://localhost:%d/users/%d", s.port, u.ID), bytes.NewReader(b))
 	s.NoError(err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -465,32 +482,28 @@ func (s *e2eTestSuite) Test_EndToEnd_UpdateUserByUserID() {
 	s.Equal(http.StatusOK, response.StatusCode)
 
 	byteBody, err := io.ReadAll(response.Body)
-	//spew.Dump(string(byteBody))
 	s.NoError(err)
 
 	var tres models.User // response
 
 	err = json.Unmarshal(byteBody, &tres)
 	if err != nil {
-		spew.Dump(err)
 		log.Fatal("err caught hocche")
 	}
 	s.Equal(http.StatusOK, response.StatusCode)
 
-	//For checking
-	users = GetAllUser()
-	u = users[0]
-	spew.Dump(u.ID)
-	spew.Dump(u.Name)
 	response.Body.Close()
+
 }
 
 func GetAllUser() []models.User {
+
 	req, err := http.NewRequest(echo.GET, fmt.Sprintf("http://localhost:%d/users", 8000), nil)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	client := http.Client{}
 	response, err := client.Do(req)
 	if err != nil {
@@ -505,12 +518,15 @@ func GetAllUser() []models.User {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	var tres []models.User // response
 	err = json.Unmarshal(byteBody, &tres)
 	if err != nil {
 		log.Fatal("err caught")
 	}
-	response.Body.Close()
-	return tres
-}
 
+	response.Body.Close()
+
+	return tres
+
+}

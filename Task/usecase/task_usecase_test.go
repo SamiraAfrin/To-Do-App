@@ -1,19 +1,21 @@
 package usecase
 
 import (
-	"To_Do_App/Task"
-	"To_Do_App/Task/mocks"
-	"To_Do_App/models"
 	"context"
 	"errors"
 	"testing"
 	"time"
+
+	"To_Do_App/Task"
+	"To_Do_App/Task/mocks"
+	"To_Do_App/models"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestCreateTask(t *testing.T) {
+
 	mockTaskRepo := new(mocks.Repository)
 	nowTime := time.Now().UTC()
 
@@ -43,16 +45,11 @@ func TestCreateTask(t *testing.T) {
 }
 
 func TestGetTaskByID(t *testing.T) {
+
 	mockTaskRepo := new(mocks.Repository)
-	//nowTime := time.Now().UTC()
 
 	mockTask := models.Task{
-		ID: 2,
-		//Name:      "task one",
-		//Status:    "pending",
-		//Comment:   "nai",
-		//UpdatedAt: &nowTime,
-		//CreatedAt: &nowTime,
+		ID:     2,
 		UserID: 1,
 	}
 
@@ -82,6 +79,7 @@ func TestGetTaskByID(t *testing.T) {
 }
 
 func TestGetTaskByUserID(t *testing.T) {
+
 	mockTaskRepo := new(mocks.Repository)
 	//nowTime := time.Now().UTC()
 
@@ -124,6 +122,7 @@ func TestGetTaskByUserID(t *testing.T) {
 	})
 }
 func TestGetAllTask(t *testing.T) {
+
 	mockTaskRepo := new(mocks.Repository)
 	mockTask := &models.Task{}
 	mockListTask := make([]*models.Task, 0)
@@ -153,7 +152,8 @@ func TestGetAllTask(t *testing.T) {
 	})
 }
 
-func TestUpdate(t *testing.T) {
+func TestTaskUpdate(t *testing.T) {
+
 	mockTaskRepo := new(mocks.Repository)
 	nowTime := time.Now().UTC()
 
@@ -163,8 +163,7 @@ func TestUpdate(t *testing.T) {
 		Status:    "pending",
 		Comment:   "nai",
 		UpdatedAt: &nowTime,
-		//CreatedAt: &nowTime,
-		UserID: 1,
+		UserID:    1,
 	}
 
 	t.Run("success", func(t *testing.T) {
@@ -192,6 +191,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestTaskDone(t *testing.T) {
+
 	mockTaskRepo := new(mocks.Repository)
 	nowTime := time.Now().UTC()
 
@@ -228,17 +228,15 @@ func TestTaskDone(t *testing.T) {
 }
 
 func TestTaskDelete(t *testing.T) {
+
 	mockTaskRepo := new(mocks.Repository)
-	//nowTime := time.Now().UTC()
 
 	mockTask := &models.Task{
 		ID:      2,
 		Name:    "task one",
 		Status:  "pending",
 		Comment: "nai",
-		//UpdatedAt: &nowTime,
-		//CreatedAt: &nowTime,
-		UserID: 1,
+		UserID:  1,
 	}
 
 	t.Run("success", func(t *testing.T) {

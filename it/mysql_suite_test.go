@@ -2,12 +2,12 @@ package it_test
 
 import (
 	"context"
+	"log"
+	"testing"
 
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
-	"testing"
 )
 
 var (
@@ -35,20 +35,7 @@ func TestMysqlRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, &MysqlRepositoryTestSuite{})
 }
 func (m *MysqlRepositoryTestSuite) SetupTest() {
-	//p, err := migrate.New("file://../db/migration", connStr)
-	//assert.NoError(m.T(), err)
-	//
-	//if err := p.Up(); err != nil {
-	//	if err == migrate.ErrNoChange {
-	//		return
-	//	}
-	//	panic(err)
-	//}
 }
 
 func (m *MysqlRepositoryTestSuite) TearDownTest() {
-	//p, err := migrate.New("file://../db.migration", connStr)
-	//spew.Dump("Hello its me bro", err)
-	//assert.NoError(m.T(), err)
-	//assert.NoError(m.T(), p.Down())
 }
