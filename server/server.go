@@ -1,19 +1,21 @@
 package server
 
 import (
+	"context"
+	"fmt"
+	"os"
+	"os/signal"
+	"time"
+	
 	_taskHttpDelivery "To_Do_App/Task/delivery/http"
 	taskRepo "To_Do_App/Task/repository"
 	_taskUsecase "To_Do_App/Task/usecase"
 	userRepo "To_Do_App/User/repository"
 	_userUsecase "To_Do_App/User/usecase"
-	"context"
-	"fmt"
+
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"os"
-	"os/signal"
-	"time"
 )
 
 type Server struct {
