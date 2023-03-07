@@ -42,7 +42,7 @@ func (m *mysqlUserRepo) Update(ctx context.Context, user *models.User) error {
 func (m *mysqlUserRepo) GetAllUser(ctx context.Context) ([]*models.User, error) {
 
 	result := make([]*models.User, 0)
-	d := m.Conn.Find(&result)
+	d := m.Conn.Order("id desc ").Find(&result)
 
 	return result, d.Error
 

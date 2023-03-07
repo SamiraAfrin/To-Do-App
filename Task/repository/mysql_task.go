@@ -46,13 +46,12 @@ func (m *mysqlTaskRepo) GetByID(ctx context.Context, task_id int64) (res *models
 func (m *mysqlTaskRepo) GetAllTask(ctx context.Context) ([]*models.Task, error) {
 
 	var result []*models.Task
-	query := m.Conn.Find(&result)
+	query := m.Conn.Order("created_at desc, id desc ").Find(&result)
 	if len(result) == 0 {
 		return result, errors.New("Currently task table doesn't have any data")
 	}
 
 	return result, query.Error
-
 }
 
 // GetByUserID Fetch all the data using user_id
