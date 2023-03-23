@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
-	
+
 	_taskHttpDelivery "To_Do_App/Task/delivery/http"
 	taskRepo "To_Do_App/Task/repository"
 	_taskUsecase "To_Do_App/Task/usecase"
